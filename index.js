@@ -2,43 +2,11 @@ const { ApolloServer } = require("apollo-server");
 const {
   ApolloServerPluginLandingPageGraphQLPlayground,
 } = require("apollo-server-core");
-const gql = require("graphql-tag");
 const mongoose = require("mongoose");
 
-const Post = require("./models/Post");
+const typeDefs = require("./graphql/typeDefs");
+const resolvers = require("./graphql/resolvers");
 const { MONGODB } = require("./config");
-
-/**
- * Defines the data structures and queries
- */
-const typeDefs = gql`
-  type Post {
-    id: ID!
-    body: String!
-    username: String!
-    createAt: String!
-  }
-  type Query {
-    getPosts: [Post]
-  }
-`;
-
-/**
- * For each query, mutation or subscription, they has its corresponding
- * resolver, and execute the logics then return the query
- */
-const resolvers = {
-  Query: {
-    getPosts: async () => {
-      try {
-        const posts = await Post.find();
-        return posts;
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
-  },
-};
 
 /**
  * Apollo server uses express server behind the scene
