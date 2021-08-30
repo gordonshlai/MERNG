@@ -4,6 +4,8 @@ const { gql } = require("apollo-server");
  * Defines the data structures and queries
  * '!' means require field when inputting the data to the database
  * The Type after the ':' in the Mutations are the type to be returned
+ *
+ * If the retrun type is wrapped in '[]', it returns a list of that type
  */
 module.exports = gql`
   type Post {
@@ -27,9 +29,12 @@ module.exports = gql`
   }
   type Query {
     getPosts: [Post]
+    getPost(postId: ID!): Post
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
     login(username: String!, password: String!): User!
+    createPost(body: String!): Post!
+    deletePost(postId: ID!): String!
   }
 `;

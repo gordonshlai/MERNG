@@ -15,6 +15,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+  context: ({ req }) => ({ req }), // So that we can access the req body in the context
 });
 
 mongoose

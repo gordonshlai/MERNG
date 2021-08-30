@@ -72,7 +72,7 @@ module.exports = {
       }
 
       // TODO: Make sure user doesn't already exsist
-      const user = User.findOne({ username }); // 'username' is the paramter to be filter against
+      const user = await User.findOne({ username }); // 'username' is the paramter to be filter against
       if (user) {
         throw new UserInputError("Username is taken", {
           errors: {
