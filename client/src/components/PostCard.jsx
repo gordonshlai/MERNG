@@ -7,6 +7,7 @@ import { AuthContext } from "../context/auth";
 
 import LikeButton from "./LikeButton";
 import DeleteButton from "./DeleteButton";
+import MyPopup from "../util/MyPopup";
 
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
@@ -33,14 +34,17 @@ const PostCard = ({
       <Card.Content extra>
         <LikeButton user={user} post={{ id, likes, likeCount }} />
 
-        <Button labelPosition="right" as={Link} to={`/posts/${id}`}>
-          <Button color="blue" basic>
-            <Icon name="comments" />
+        <MyPopup content="Comment on post" t>
+          <Button labelPosition="right" as={Link} to={`/posts/${id}`}>
+            <Button color="blue" basic>
+              <Icon name="comments" />
+            </Button>
+            <Label basic color="blue" pointing="left">
+              {commentCount}
+            </Label>
           </Button>
-          <Label basic color="blue" pointing="left">
-            {commentCount}
-          </Label>
-        </Button>
+        </MyPopup>
+
         {user?.username === username && <DeleteButton postId={id} />}
       </Card.Content>
     </Card>

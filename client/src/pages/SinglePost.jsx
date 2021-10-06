@@ -13,6 +13,7 @@ import {
 import DeleteButton from "../components/DeleteButton";
 import LikeButton from "../components/LikeButton";
 import { AuthContext } from "../context/auth";
+import MyPopup from "../util/MyPopup";
 // import { FETCH_POSTS_QUERY } from "../util/graphql";
 
 var relativeTime = require("dayjs/plugin/relativeTime");
@@ -74,18 +75,20 @@ function SinglePost(props) {
                 <hr />
                 <Card.Content extra>
                   <LikeButton user={user} post={{ id, likeCount, likes }} />
-                  <Button
-                    as="div"
-                    labelPosition="right"
-                    onClick={() => console.log("comment on post")}
-                  >
-                    <Button basic color="blue">
-                      <Icon name="comments" />
+                  <MyPopup content="Comment on post">
+                    <Button
+                      as="div"
+                      labelPosition="right"
+                      onClick={() => console.log("comment on post")}
+                    >
+                      <Button basic color="blue">
+                        <Icon name="comments" />
+                      </Button>
+                      <Label basic color="blue" pointing="left">
+                        {commentCount}
+                      </Label>
                     </Button>
-                    <Label basic color="blue" pointing="left">
-                      {commentCount}
-                    </Label>
-                  </Button>
+                  </MyPopup>
                   {user?.username === username && (
                     <DeleteButton postId={id} callback={deletePostCallback} />
                   )}
