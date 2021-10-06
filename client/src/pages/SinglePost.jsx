@@ -1,11 +1,19 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import dayjs from "dayjs";
-import React, { useContext } from "react";
-import { Button, Card, Grid, Icon, Image, Label } from "semantic-ui-react";
+import React, { useContext, useRef, useState } from "react";
+import {
+  Button,
+  Card,
+  Form,
+  Grid,
+  Icon,
+  Image,
+  Label,
+} from "semantic-ui-react";
 import DeleteButton from "../components/DeleteButton";
 import LikeButton from "../components/LikeButton";
 import { AuthContext } from "../context/auth";
-import { FETCH_POSTS_QUERY } from "../util/graphql";
+// import { FETCH_POSTS_QUERY } from "../util/graphql";
 
 var relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
@@ -15,10 +23,20 @@ function SinglePost(props) {
 
   const postId = props.match.params.postId;
 
+  const commentInputRef = useRef(null);
+
   const { data } = useQuery(FETCH_POST_QUERY, {
     variables: { postId },
   });
 
+  const [comment, setComment] = useState("");
+  const [createComment] = useMutation(CREATE_COMMENT_MUTATION, {
+    update() {
+      setComment("");
+      commentInputRef.current.blur();
+    },
+    variables: { postId, body: comment },
+  });
   const deletePostCallback = () => {
     props.history.push("/");
   };
@@ -74,6 +92,45 @@ function SinglePost(props) {
                 </Card.Content>
               </Card.Content>
             </Card>
+            {user && (
+              <Card fluid>
+                <Card.Content>
+                  <p>Post a comment</p>
+                  <Form>
+                    <div className="ui action input fluid">
+                      <input
+                        type="text"
+                        placeholder="Comment..."
+                        name="comment"
+                        value={comment}
+                        onChange={(event) => setComment(event.target.value)}
+                        ref={commentInputRef}
+                      />
+                      <button
+                        type="submit"
+                        className="ui button teal"
+                        disabled={!comment.trim()}
+                        onClick={createComment}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </Form>
+                </Card.Content>
+              </Card>
+            )}
+            {comments.map((comment) => (
+              <Card fluid key={comment.id}>
+                <Card.Content>
+                  {user?.username === comment.username && (
+                    <DeleteButton postId={id} commentId={comment.id} />
+                  )}
+                  <Card.Header>{comment.username}</Card.Header>
+                  <Card.Meta>{dayjs(comment.createdAt).fromNow()}</Card.Meta>
+                  <Card.Description>{comment.body}</Card.Description>
+                </Card.Content>
+              </Card>
+            ))}
           </Grid.Column>
         </Grid.Row>
       </Grid>
@@ -82,6 +139,21 @@ function SinglePost(props) {
 
   return postMarkup;
 }
+
+const CREATE_COMMENT_MUTATION = gql`
+  mutation ($postId: ID!, $body: String!) {
+    createComment(postId: $postId, body: $body) {
+      id
+      comments {
+        id
+        body
+        createdAt
+        username
+      }
+      commentCount
+    }
+  }
+`;
 
 const FETCH_POST_QUERY = gql`
   query ($postId: ID!) {
